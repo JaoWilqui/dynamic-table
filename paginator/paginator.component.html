@@ -1,0 +1,59 @@
+<div *ngIf="pageSizeOptions" class="page-size-select-box">
+  <h4>Por página:</h4>
+  <select class="paginator-select" [formControl]="pageSizeControl">
+    <option *ngFor="let pageSize of pageSizeOptions" [value]="pageSize">
+      {{ pageSize }}
+    </option>
+  </select>
+</div>
+<div class="paginator-container">
+  <div class="paginator-info mr-2">
+    {{ "Mostrando " + pageIndex + " de " + totPages + " páginas" }}
+  </div>
+  <div class="paginator-box">
+    <button
+      class="page-box"
+      [ngClass]="pageIndex === 0 ? 'selected' : ''"
+      [disabled]="pageIndex == 1"
+      matTooltip="Primeira página"
+      (click)="selectPage(1); $event.preventDefault()"
+    >
+      <mat-icon class="step-icon">keyboard_double_arrow_left</mat-icon>
+    </button>
+    <button
+      (click)="selectPage(pageIndex - 1); $event.preventDefault()"
+      class="page-box"
+      matTooltip="Página anterior"
+      [disabled]="pageIndex == 1"
+    >
+      <mat-icon class="step-icon ml-1">arrow_back_ios</mat-icon>
+    </button>
+    <div class="flex">
+      <div *ngFor="let page of pages; let i = index">
+        <button
+          class="page-box"
+          [ngClass]="page === pageIndex ? 'selected' : ''"
+          (click)="selectPage(page); $event.preventDefault()"
+        >
+          {{ page }}
+        </button>
+      </div>
+    </div>
+    <button
+      class="page-box"
+      (click)="selectPage(pageIndex + 1); $event.preventDefault()"
+      [disabled]="pageIndex == totPages || totPages == -1"
+      matTooltip="Próxima página"
+    >
+      <mat-icon class="step-icon">arrow_forward_ios</mat-icon>
+    </button>
+    <button
+      class="page-box"
+      (click)="selectPage(totPages); $event.preventDefault()"
+      [disabled]="pageIndex == totPages || totPages == -1"
+      matTooltip="Última página"
+    >
+      <mat-icon class="step-icon">keyboard_double_arrow_right</mat-icon>
+    </button>
+  </div>
+</div>
