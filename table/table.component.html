@@ -1,0 +1,86 @@
+<mat-progress-bar mode="indeterminate" *ngIf="isLoading"></mat-progress-bar>
+<table
+  matSort
+  id="table"
+  class="main-table"
+  (matSortChange)="sortTable($event)"
+  [ngClass]="{ 'have-selection': haveSelectRow }"
+>
+  <tbody [ngStyle]="{ 'min-width': minWidth }">
+    <!-- Header -->
+    <tr class="row-header">
+      <ng-container *ngFor="let item of tableColumns">
+        <th *ngIf="item.isSortable" [mat-sort-header]="item.dataKey">
+          {{ item.name }}
+        </th>
+        <th *ngIf="!item.isSortable">
+          {{ item.name }}
+        </th>
+      </ng-container>
+      <th class="header-options" *ngIf="options">
+        <span>{{ options }}</span>
+      </th>
+    </tr>
+    <tr
+      class="row-content"
+      *ngFor="let element of tableData; let i = index"
+      (click)="selectElement(element)"
+      [style.background-color]="
+        haveSelectRow && element[haveSelectRow.selectKey]
+          ? haveSelectRow.bgColor
+          : ''
+      "
+    >
+      <ng-container *ngFor="let column of tableColumns">
+        <!-- Colunas custom - Passadas como "slot" -->
+        <ng-container *ngIf="column.isContent">
+          <td
+            *ngFor="
+              let customColumn of customColumns | fieldFilter : column.dataKey
+            "
+            [style.whiteSpace]="column.noBreakLine === true ? 'nowrap' : ''"
+          >
+            <ng-template
+              [ngTemplateOutlet]="customColumn.templateRef"
+              [ngTemplateOutletContext]="{ element: element, index: i }"
+            ></ng-template>
+          </td>
+        </ng-container>
+
+        <!-- Colunas Padrões  -->
+        <td
+          *ngIf="!column.isContent"
+          [ngClass]="column.classCustom ? column.classCustom(element) : ''"
+          [ngStyle]="column.styleCustom ?? ''"
+          [style.whiteSpace]="column.noBreakLine === true ? 'nowrap' : ''"
+        >
+          {{
+            getValue(element, column.dataKey, column.objectKey)
+              | dynamicPipe : column.pipe : column.pipeArgs
+          }}
+        </td>
+      </ng-container>
+
+      <!-- Coluna "Ações"  -->
+      <ng-container *ngIf="options">
+        <td class="cell-options">
+          <div class="wrap-options">
+            <ng-template
+              [ngTemplateOutlet]="actionTemplate"
+              [ngTemplateOutletContext]="{ element: element }"
+            ></ng-template>
+          </div>
+        </td>
+      </ng-container>
+    </tr>
+  </tbody>
+</table>
+
+<paginator
+  *ngIf="isPageable"
+  #paginator
+  [pageSize]="pageSize"
+  [pageOptions]="pageOptions"
+  [pageSizeOptions]="pageSizeOptions"
+  (onPageChange)="pageChange($event)"
+></paginator>
